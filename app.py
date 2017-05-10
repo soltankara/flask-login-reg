@@ -40,15 +40,13 @@ def login():
 	error = None
 
 	if request.method == 'POST':
+		error = 'Invalid username or password! Please, try again!'
 		user = Users.query.filter_by(username = form.username.data).first()
 
 		if user:
 			if check_password_hash(user.password, form.password.data):
 				login_user(user, remember = form.remember.data)
 				return redirect(url_for('home'))
-
-
-	error = 'Invalid username or password! Please, try again!'
 
 	return render_template('login.html', form = form, error = error)
 
@@ -65,7 +63,9 @@ def signup():
 		db.session.add(user)
 		db.session.commit()
 
-		return 'successfully added'
+		login_user(user)
+		return redirect(url_for('home'))
+
 
 	return render_template('signup.html', form = form)
 
